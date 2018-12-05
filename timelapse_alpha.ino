@@ -26,6 +26,10 @@
 #define MOTOR_LEFT_PIN 11
 #define MOTOR_RIGHT_PIN 12
 
+#define CMD_SETUP 0 
+#define CMD_ACQUIRE 1 
+#define CMD_INFO 2
+
 
 // structure to store the details of an LED channel trigger
 typedef struct {
@@ -58,9 +62,38 @@ void setup() {
 
 
 
+/*
+ listen to the serial port for commands
+ all messages start with a header
 
-// listen to the serial port for commands
-byte listen_serial_port(void) {
+ SET - initialize the triggers
+ ACQ - acquire
+ INF - return status info
+*/
+uint8_t listen_serial_port(void) {
+
+  // read the data from the serial port, if available
+  if(Serial.available() > 0) {
+
+    // read the buffer as a string
+    String data = Serial.readString();
+
+    // get the header
+    char header = data.charAt(0);
+
+    switch (header) {
+      case 'S':
+        break;
+      case 'A':
+        break;
+      case 'I':
+        break;
+    }
+
+  
+
+  }
+  
   return 0;
 }
 
