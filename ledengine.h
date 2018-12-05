@@ -40,12 +40,14 @@ class LEDEngine
     off();  
   }
 
+  // turn the LED and camera trigger ON
   void on() {
     for (uint8_t i=0; i<2; i++) {
       digitalWrite(m_pins[i], HIGH);
     }
   }
 
+  // turn the LED and camera trigger OFF
   void off() {
     for (uint8_t i=0; i<2; i++) {
       digitalWrite(m_pins[i], LOW);
