@@ -37,13 +37,13 @@ class StepperMotorBSC201
     // jog the motor left
     void jog_left() {
       jog(m_motor_left_pin);
-      m_motor_position -=1;
+      m_motor_position--;
     }
 
     // jog the motor left
     void jog_right() {
       jog(m_motor_right_pin);
-      m_motor_position +=1;
+      m_motor_position++;
     }
 
     int motor_position() {
