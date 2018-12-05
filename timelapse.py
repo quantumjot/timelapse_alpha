@@ -45,7 +45,7 @@ class ArduinoAcquisitionManager(object):
         pass
 
     def info(self):
-        """ Get info from the arduino ""
+        """ Get info from the arduino """
         arduino.write("INF")
 
     def setup(self):
