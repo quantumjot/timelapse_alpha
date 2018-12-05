@@ -18,6 +18,9 @@ class StepperMotorBSC201
 {
   public:
 
+    StepperMotorBSC201() {};
+    ~StepperMotorBSC201() {};
+
     StepperMotorBSC201(uint8_t a_motor_left_pin, uint8_t a_motor_right_pin) {
 
       // set the member variables
@@ -41,6 +44,10 @@ class StepperMotorBSC201
     void jog_right() {
       jog(m_motor_right_pin);
       m_motor_position +=1;
+    }
+
+    int motor_position() {
+      return m_motor_position;
     }
 
 

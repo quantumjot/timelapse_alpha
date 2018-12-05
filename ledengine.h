@@ -18,6 +18,7 @@ class LEDEngine
 {
   public:
 
+    LEDEngine() {};
     LEDEngine(uint8_t a_LED_pin, uint8_t a_camera_pin) {
 
       // set the member variables

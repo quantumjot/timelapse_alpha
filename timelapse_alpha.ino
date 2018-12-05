@@ -39,19 +39,26 @@ typedef struct {
 } trigger;
 
 
+// global vars here
+StepperMotorBSC201 stepper;
+trigger trigger_BF;
+trigger trigger_GFP;
+trigger trigger_RFP;
+trigger trigger_IRFP;
+
 
 void setup() {
   // set up the serial port to receive data
   Serial.begin(115200);
 
   // set up the stepper motor 
-  StepperMotorBSC201 stepper(MOTOR_LEFT_PIN, MOTOR_RIGHT_PIN);
+  stepper = StepperMotorBSC201(MOTOR_LEFT_PIN, MOTOR_RIGHT_PIN);
 
   // set up the digital pins used to trigger LEDs and the camera
-  trigger trig_BF   = {LEDEngine(  BF_CHANNEL_PIN, CAMERA_CHANNEL_PIN), 0, 50};
-  trigger trig_GFP  = {LEDEngine( GFP_CHANNEL_PIN, CAMERA_CHANNEL_PIN), 0, 100};
-  trigger trig_RFP  = {LEDEngine( RFP_CHANNEL_PIN, CAMERA_CHANNEL_PIN), 0, 100};
-  trigger trig_IRFP = {LEDEngine(IRFP_CHANNEL_PIN, CAMERA_CHANNEL_PIN), 1, 100};
+  trigger_BF   = {LEDEngine(  BF_CHANNEL_PIN, CAMERA_CHANNEL_PIN), 0, 50};
+  trigger_GFP  = {LEDEngine( GFP_CHANNEL_PIN, CAMERA_CHANNEL_PIN), 0, 100};
+  trigger_RFP  = {LEDEngine( RFP_CHANNEL_PIN, CAMERA_CHANNEL_PIN), 0, 100};
+  trigger_IRFP = {LEDEngine(IRFP_CHANNEL_PIN, CAMERA_CHANNEL_PIN), 1, 100};
   
 }
 
@@ -85,8 +92,11 @@ uint8_t listen_serial_port(void) {
       case 'S':
         break;
       case 'A':
+        // TODO(arl): This is just a test trigger
+        trigger_BF.LED.trigger(200);
         break;
       case 'I':
+        Serial.println(stepper.motor_position());
         break;
     }
 
@@ -102,5 +112,8 @@ uint8_t listen_serial_port(void) {
 void loop() {
   // listen to the serial port
   listen_serial_port();
+
+  // trig_BF.LED.trigger(100);
+  delay(1);
 
 }
