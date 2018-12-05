@@ -14,6 +14,8 @@
  * 
  */
 
+#define FILTER_WHEEL_POSITIONS 6
+
 class StepperMotorBSC201
 {
   public:
@@ -46,20 +48,40 @@ class StepperMotorBSC201
       m_motor_position++;
     }
 
+    // get the motor position
     int motor_position() {
       return m_motor_position;
     }
 
+    // go to a certain filter position
+    void goto_position(uint8_t a_position) {
+      uint8_t curr_position = m_motor_position % FILTER_WHEEL_POSITIONS;
+
+      // do we actually need to move the motor?
+      if(a_position == curr_position) return;
+
+      // now we should calculate the number of moves to the left or right to achieve the new position
+      unsigned int moves_left;
+      unsigned int moves_right;
+
+      if(moves_left > moves_right) {
+        // move the motor right
+      } else {
+        // move the motor left
+      }
+      
+    }
+
 
   private:
-
     // store the pins to jog the motor
     uint8_t m_motor_left_pin;
     uint8_t m_motor_right_pin;
 
+    // internal motor position
     int m_motor_position;
   
-    // send a TTL pulse to the motor jog pins
+    // send a TTL pulse to the motor jog pins, note that this takes approx 55ms
     void jog(uint8_t a_pin) {
       // TODO(arl): error check for the correct pins
       digitalWrite(a_pin, HIGH);

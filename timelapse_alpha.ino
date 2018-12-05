@@ -26,9 +26,7 @@
 #define MOTOR_LEFT_PIN 11
 #define MOTOR_RIGHT_PIN 12
 
-#define CMD_SETUP 0 
-#define CMD_ACQUIRE 1 
-#define CMD_INFO 2
+#define MAX_TRIGGERS 4
 
 
 // structure to store the details of an LED channel trigger
@@ -36,6 +34,7 @@ typedef struct {
   LEDEngine LED;
   uint8_t motor_position;
   unsigned int duration_ms;
+  bool active;
 } trigger;
 
 
@@ -46,6 +45,8 @@ trigger trigger_GFP;
 trigger trigger_RFP;
 trigger trigger_IRFP;
 
+trigger triggers[MAX_TRIGGERS];
+
 
 void setup() {
   // set up the serial port to receive data
@@ -55,10 +56,12 @@ void setup() {
   stepper = StepperMotorBSC201(MOTOR_LEFT_PIN, MOTOR_RIGHT_PIN);
 
   // set up the digital pins used to trigger LEDs and the camera
-  trigger_BF   = {LEDEngine(  BF_CHANNEL_PIN, CAMERA_CHANNEL_PIN), 0, 50};
-  trigger_GFP  = {LEDEngine( GFP_CHANNEL_PIN, CAMERA_CHANNEL_PIN), 0, 100};
-  trigger_RFP  = {LEDEngine( RFP_CHANNEL_PIN, CAMERA_CHANNEL_PIN), 0, 100};
-  trigger_IRFP = {LEDEngine(IRFP_CHANNEL_PIN, CAMERA_CHANNEL_PIN), 1, 100};
+  trigger_BF   = {LEDEngine(  BF_CHANNEL_PIN, CAMERA_CHANNEL_PIN), 0, 50, false};
+  trigger_GFP  = {LEDEngine( GFP_CHANNEL_PIN, CAMERA_CHANNEL_PIN), 0, 100, false};
+  trigger_RFP  = {LEDEngine( RFP_CHANNEL_PIN, CAMERA_CHANNEL_PIN), 0, 100, false};
+  trigger_IRFP = {LEDEngine(IRFP_CHANNEL_PIN, CAMERA_CHANNEL_PIN), 1, 100, false};
+
+  // set up the triggers
   
 }
 
@@ -89,13 +92,20 @@ uint8_t listen_serial_port(void) {
     char header = data.charAt(0);
 
     switch (header) {
-      case 'S':
-        break;
       case 'A':
+        // ACQUIRE
         // TODO(arl): This is just a test trigger
         trigger_BF.LED.trigger(200);
         break;
+        
+      case 'S':
+        // SETUP
+        break;
+
       case 'I':
+        // INFO
+
+        // return the stepper motor position
         Serial.println(stepper.motor_position());
         break;
     }
