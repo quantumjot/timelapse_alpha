@@ -17,9 +17,10 @@
 #include "bsc201.h"
 
 
-#define GFP_CHANNEL_PIN 7
-#define RFP_CHANNEL_PIN 8 
-#define IRFP_CHANNEL_PIN 9
+#define BF_CHANNEL_PIN 7
+#define GFP_CHANNEL_PIN 8
+#define RFP_CHANNEL_PIN 9
+#define IRFP_CHANNEL_PIN 10
 #define CAMERA_CHANNEL_PIN 13
 
 #define MOTOR_LEFT_PIN 11
@@ -29,7 +30,7 @@
 // structure to store the details of an LED channel trigger
 typedef struct {
   LEDEngine LED;
-  unsigned int motor_position;
+  uint8_t motor_position;
   unsigned int duration_ms;
 } trigger;
 
@@ -43,9 +44,10 @@ void setup() {
   StepperMotorBSC201 stepper(MOTOR_LEFT_PIN, MOTOR_RIGHT_PIN);
 
   // set up the digital pins used to trigger LEDs and the camera
-  LEDEngine GFP_LED(GFP_CHANNEL_PIN, CAMERA_CHANNEL_PIN);
-  LEDEngine RFP_LED(RFP_CHANNEL_PIN, CAMERA_CHANNEL_PIN);
-  LEDEngine IRFP_LED(IRFP_CHANNEL_PIN, CAMERA_CHANNEL_PIN);
+  trigger trig_BF   = {LEDEngine(  BF_CHANNEL_PIN, CAMERA_CHANNEL_PIN), 0, 50};
+  trigger trig_GFP  = {LEDEngine( GFP_CHANNEL_PIN, CAMERA_CHANNEL_PIN), 0, 100};
+  trigger trig_RFP  = {LEDEngine( RFP_CHANNEL_PIN, CAMERA_CHANNEL_PIN), 0, 100};
+  trigger trig_IRFP = {LEDEngine(IRFP_CHANNEL_PIN, CAMERA_CHANNEL_PIN), 1, 100};
   
 }
 
