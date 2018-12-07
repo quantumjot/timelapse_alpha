@@ -16,27 +16,25 @@
 #include "ledengine.h"
 #include "bsc201.h"
 
-
+// this is the pin from the camera strobe trigger
+#define CAMERA_CHANNEL_PIN 2
+#define MOTOR_LEFT_PIN 4
+#define MOTOR_RIGHT_PIN 5
 #define BF_CHANNEL_PIN 7
 #define GFP_CHANNEL_PIN 8
 #define RFP_CHANNEL_PIN 9
 #define IRFP_CHANNEL_PIN 10
-#define CAMERA_CHANNEL_PIN 13
-
-#define MOTOR_LEFT_PIN 11
-#define MOTOR_RIGHT_PIN 12
-
 #define MAX_TRIGGERS 4
+
+
 
 
 // structure to store the details of an LED channel trigger
 typedef struct {
   LEDEngine LED;
   uint8_t motor_position;
-  unsigned int duration_ms;
   bool active;
 } trigger;
-
 
 // global vars here
 StepperMotorBSC201 stepper;
@@ -44,9 +42,11 @@ trigger trigger_BF;
 trigger trigger_GFP;
 trigger trigger_RFP;
 trigger trigger_IRFP;
-
 trigger triggers[MAX_TRIGGERS];
 
+
+volatile byte state = LOW;
+volatile byte motor = 0;
 
 void setup() {
   // set up the serial port to receive data
@@ -56,16 +56,27 @@ void setup() {
   stepper = StepperMotorBSC201(MOTOR_LEFT_PIN, MOTOR_RIGHT_PIN);
 
   // set up the digital pins used to trigger LEDs and the camera
-  trigger_BF   = {LEDEngine(  BF_CHANNEL_PIN, CAMERA_CHANNEL_PIN), 0, 50, false};
-  trigger_GFP  = {LEDEngine( GFP_CHANNEL_PIN, CAMERA_CHANNEL_PIN), 0, 100, false};
-  trigger_RFP  = {LEDEngine( RFP_CHANNEL_PIN, CAMERA_CHANNEL_PIN), 0, 100, false};
-  trigger_IRFP = {LEDEngine(IRFP_CHANNEL_PIN, CAMERA_CHANNEL_PIN), 1, 100, false};
+  trigger_BF   = {LEDEngine(  BF_CHANNEL_PIN), 0, false};
+  trigger_GFP  = {LEDEngine( GFP_CHANNEL_PIN), 0, false};
+  trigger_RFP  = {LEDEngine( RFP_CHANNEL_PIN), 0, false};
+  trigger_IRFP = {LEDEngine(IRFP_CHANNEL_PIN), 1, false};
 
-  // set up the triggers
-  
+  // set up the input/strobe triggers
+  // use the internal 20kOhm pull-up resistor NOTE: the logic is inverted due to the pullup
+  pinMode(CAMERA_CHANNEL_PIN, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(CAMERA_CHANNEL_PIN), rising_interrupt, RISING);
+  attachInterrupt(digitalPinToInterrupt(CAMERA_CHANNEL_PIN), falling_interrupt, FALLING);
 }
 
 
+
+void rising_interrupt() {
+  
+}
+
+void falling_interrupt() {
+  
+}
 
 
 
@@ -122,8 +133,5 @@ uint8_t listen_serial_port(void) {
 void loop() {
   // listen to the serial port
   listen_serial_port();
-
-  // trig_BF.LED.trigger(100);
-  delay(1);
 
 }

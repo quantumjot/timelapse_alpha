@@ -19,18 +19,18 @@ class LEDEngine
   public:
 
     LEDEngine() {};
-    LEDEngine(uint8_t a_LED_pin, uint8_t a_camera_pin) {
+    LEDEngine(uint8_t a_LED_pin) {
 
       // set the member variables
       m_LED_pin = a_LED_pin;
-      m_camera_pin = a_camera_pin;
+      //m_camera_pin = a_camera_pin;
 
-      m_pins[0] = m_LED_pin;
-      m_pins[1] = m_camera_pin;
+//      m_pins[0] = m_LED_pin;
+//      m_pins[1] = m_camera_pin;
 
       // set these pins to outputs 
       pinMode(m_LED_pin, OUTPUT);
-      pinMode(m_camera_pin, OUTPUT);
+      // pinMode(m_camera_pin, OUTPUT);
     }
 
 
@@ -41,23 +41,19 @@ class LEDEngine
     off();  
   }
 
-  // turn the LED and camera trigger ON
+  // turn the LED ON
   void on() {
-    for (uint8_t i=0; i<2; i++) {
-      digitalWrite(m_pins[i], HIGH);
-    }
+    digitalWrite(m_LED_pin, HIGH);
   }
 
   // turn the LED and camera trigger OFF
   void off() {
-    for (uint8_t i=0; i<2; i++) {
-      digitalWrite(m_pins[i], LOW);
-    }
+    digitalWrite(m_LED_pin, LOW);
   }
 
 
   private:
     uint8_t m_LED_pin;
-    uint8_t m_camera_pin;
-    uint8_t m_pins[2];
+//    uint8_t m_camera_pin;
+//    uint8_t m_pins[2];
 };
