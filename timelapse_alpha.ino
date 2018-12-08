@@ -13,8 +13,7 @@
  * 
  */
 
-#include "ledengine.h"
-#include "bsc201.h"
+#include "sequencer.h"
 
 // this is the pin from the camera strobe trigger
 #define CAMERA_CHANNEL_PIN 2
@@ -26,57 +25,44 @@
 #define IRFP_CHANNEL_PIN 10
 #define MAX_TRIGGERS 4
 
-
-
-
-// structure to store the details of an LED channel trigger
-typedef struct {
-  LEDEngine LED;
-  uint8_t motor_position;
-  bool active;
-} trigger;
-
-// global vars here
-StepperMotorBSC201 stepper;
-trigger trigger_BF;
-trigger trigger_GFP;
-trigger trigger_RFP;
-trigger trigger_IRFP;
-trigger triggers[MAX_TRIGGERS];
-
-
+// states for trigger interrupts
 volatile byte state = LOW;
-volatile byte motor = 0;
+volatile byte motor = HIGH;
 
 void setup() {
   // set up the serial port to receive data
   Serial.begin(115200);
 
-  // set up the stepper motor 
-  stepper = StepperMotorBSC201(MOTOR_LEFT_PIN, MOTOR_RIGHT_PIN);
-
-  // set up the digital pins used to trigger LEDs and the camera
-  trigger_BF   = {LEDEngine(  BF_CHANNEL_PIN), 0, false};
-  trigger_GFP  = {LEDEngine( GFP_CHANNEL_PIN), 0, false};
-  trigger_RFP  = {LEDEngine( RFP_CHANNEL_PIN), 0, false};
-  trigger_IRFP = {LEDEngine(IRFP_CHANNEL_PIN), 1, false};
-
+  // set up the trigger sequencer
+  TriggerSequencer sequencer;
+  sequencer.clear_triggers();
+  sequencer.add_trigger(BF_CHANNEL_PIN, 0, true);
+  
   // set up the input/strobe triggers
   // use the internal 20kOhm pull-up resistor NOTE: the logic is inverted due to the pullup
   pinMode(CAMERA_CHANNEL_PIN, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(CAMERA_CHANNEL_PIN), rising_interrupt, RISING);
-  attachInterrupt(digitalPinToInterrupt(CAMERA_CHANNEL_PIN), falling_interrupt, FALLING);
+  attachInterrupt(digitalPinToInterrupt(CAMERA_CHANNEL_PIN), camera_trigger_interrupt, CHANGE);
 }
 
 
 
-void rising_interrupt() {
+void camera_trigger_interrupt() {
+  // use an interupt to get the pin
+  // byte trigger_state = digitalRead(CAMERA_CHANNEL_PIN);
+
+  // get the state of the input
+  byte trigger_state = (PIND & B00000100) >> 2;
   
+  if (trigger_state == HIGH) {
+    state = LOW;
+    motor = HIGH;
+    return;
+  } else {
+    state = HIGH;
+    motor = LOW;
+  }
 }
 
-void falling_interrupt() {
-  
-}
 
 
 
@@ -106,7 +92,7 @@ uint8_t listen_serial_port(void) {
       case 'A':
         // ACQUIRE
         // TODO(arl): This is just a test trigger
-        trigger_BF.LED.trigger(200);
+        // trigger_BF.LED.trigger(200);
         break;
         
       case 'S':
@@ -117,7 +103,6 @@ uint8_t listen_serial_port(void) {
         // INFO
 
         // return the stepper motor position
-        Serial.println(stepper.motor_position());
         break;
     }
 
@@ -132,6 +117,19 @@ uint8_t listen_serial_port(void) {
 
 void loop() {
   // listen to the serial port
-  listen_serial_port();
+  // listen_serial_port();
+
+  digitalWrite(BF_CHANNEL_PIN, state);
+  digitalWrite(MOTOR_LEFT_PIN, motor);
+
+  // get the state of the input
+  byte input_states = (PIND & B00000100) >> 2;
+
+  Serial.print("state: ");
+  Serial.println(input_states, BIN);
+//  Serial.print(" motor: ");
+//  Serial.println(motor, DEC);
+
+  delay(10);
 
 }

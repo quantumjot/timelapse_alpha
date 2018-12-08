@@ -33,6 +33,8 @@ class StepperMotorBSC201
       // set these pins to outputs 
       pinMode(m_motor_left_pin, OUTPUT);
       pinMode(m_motor_right_pin, OUTPUT);
+
+      m_initialized = true;
     }
     
 
@@ -72,8 +74,16 @@ class StepperMotorBSC201
       
     }
 
+    // is the motor initialized
+    bool is_initialized() {
+      return m_initialized;
+    }
+
 
   private:
+    // flag for initialized 
+    bool m_initialized = false;
+  
     // store the pins to jog the motor
     uint8_t m_motor_left_pin;
     uint8_t m_motor_right_pin;
