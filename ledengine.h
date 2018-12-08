@@ -47,7 +47,6 @@ class LEDEngine
     digitalWrite(m_LED_pin, HIGH);
   }
 
-
   private:
     uint8_t m_LED_pin;
 };

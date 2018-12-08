@@ -20,8 +20,8 @@ class StepperMotorBSC201
 {
   public:
 
-    StepperMotorBSC201() {};
-    ~StepperMotorBSC201() {};
+    StepperMotorBSC201() {}
+    ~StepperMotorBSC201() {}
 
     StepperMotorBSC201(uint8_t a_motor_left_pin, uint8_t a_motor_right_pin) {
 
@@ -57,22 +57,27 @@ class StepperMotorBSC201
 
     // go to a certain filter position
     void goto_position(uint8_t a_position) {
-      uint8_t curr_position = m_motor_position % FILTER_WHEEL_POSITIONS;
+      uint8_t current_position = m_motor_position % FILTER_WHEEL_POSITIONS;
 
       // do we actually need to move the motor?
       if(a_position == curr_position) return;
 
-      // now we should calculate the number of moves to the left or right to achieve the new position
-      unsigned int moves_left;
-      unsigned int moves_right;
+      // move difference
+      int position_diff = a_position - current_position;
 
-      // test function
-      jog_left();
+      // SANITY check, make sure we don't move too many positions
+      if(abs(position_diff) >= FILTER_WHEEL_POSITIONS) return;
 
-      if(moves_left > moves_right) {
+      if(position_diff > 0) {
         // move the motor right
+        for(unsigned int mv=0; mv<abs(position_diff); mv++) {
+          jog_right();
+        }
       } else {
         // move the motor left
+        for(unsigned int mv=0; mv<abs(position_diff); mv++) {
+          jog_left();
+        }
       }
       
     }

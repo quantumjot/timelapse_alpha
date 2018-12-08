@@ -22,11 +22,13 @@
 #define RFP_CHANNEL_PIN 9
 #define IRFP_CHANNEL_PIN 10
 
-
-
 // states for trigger interrupts (0 - WAIT, 1-ACQUIRE, 2-MOVE)
 volatile byte state = STATE_WAIT;
 
+// timelapse mode
+bool timelapse_mode = false;
+
+// trigger sequencer
 TriggerSequencer sequencer;
 
 void setup() {
@@ -121,7 +123,6 @@ void loop() {
   // listen_serial_port();
 
   // get the current trigger
-  //Trigger current_trigger = sequencer.get_current_trigger();
   sequencer.set_state(&state);
 
   // get the state of the input

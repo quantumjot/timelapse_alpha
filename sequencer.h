@@ -41,6 +41,8 @@ typedef struct {
 
 class TriggerSequencer {
   public:
+
+    // constructor and destructor
     TriggerSequencer() {}
     ~TriggerSequencer() {}
 
@@ -74,6 +76,10 @@ class TriggerSequencer {
 
     void set_state(volatile byte* a_state) {
 
+      // SANITY CHECK, don't trigger if there are none!
+      if (m_num_triggers < 1) return;
+
+      // get the current and subsequent trigger.
       Trigger* this_trigger = get_trigger(m_counter);
       Trigger* next_trigger = get_trigger(m_counter+1);
       
