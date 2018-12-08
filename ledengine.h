@@ -20,17 +20,12 @@ class LEDEngine
 
     LEDEngine() {};
     LEDEngine(uint8_t a_LED_pin) {
-
       // set the member variables
       m_LED_pin = a_LED_pin;
-      //m_camera_pin = a_camera_pin;
-
-//      m_pins[0] = m_LED_pin;
-//      m_pins[1] = m_camera_pin;
 
       // set these pins to outputs 
       pinMode(m_LED_pin, OUTPUT);
-      // pinMode(m_camera_pin, OUTPUT);
+      off();
     }
 
 
@@ -42,18 +37,17 @@ class LEDEngine
   }
 
   // turn the LED ON
+  // NOTE(arl): temporary for common cathode LEDs
   void on() {
-    digitalWrite(m_LED_pin, HIGH);
+    digitalWrite(m_LED_pin, LOW);
   }
 
   // turn the LED and camera trigger OFF
   void off() {
-    digitalWrite(m_LED_pin, LOW);
+    digitalWrite(m_LED_pin, HIGH);
   }
 
 
   private:
     uint8_t m_LED_pin;
-//    uint8_t m_camera_pin;
-//    uint8_t m_pins[2];
 };

@@ -17,26 +17,28 @@
 
 // this is the pin from the camera strobe trigger
 #define CAMERA_CHANNEL_PIN 2
-#define MOTOR_LEFT_PIN 4
-#define MOTOR_RIGHT_PIN 5
 #define BF_CHANNEL_PIN 7
 #define GFP_CHANNEL_PIN 8
 #define RFP_CHANNEL_PIN 9
 #define IRFP_CHANNEL_PIN 10
-#define MAX_TRIGGERS 4
 
-// states for trigger interrupts
-volatile byte state = LOW;
-volatile byte motor = HIGH;
+
+
+// states for trigger interrupts (0 - WAIT, 1-ACQUIRE, 2-MOVE)
+volatile byte state = STATE_WAIT;
+
+TriggerSequencer sequencer;
 
 void setup() {
   // set up the serial port to receive data
   Serial.begin(115200);
 
   // set up the trigger sequencer
-  TriggerSequencer sequencer;
   sequencer.clear_triggers();
   sequencer.add_trigger(BF_CHANNEL_PIN, 0, true);
+  sequencer.add_trigger(GFP_CHANNEL_PIN, 1, true);
+  sequencer.add_trigger(RFP_CHANNEL_PIN, 2, true);
+  //sequencer.add_trigger(BF_CHANNEL_PIN, 3, true);
   
   // set up the input/strobe triggers
   // use the internal 20kOhm pull-up resistor NOTE: the logic is inverted due to the pullup
@@ -52,14 +54,13 @@ void camera_trigger_interrupt() {
 
   // get the state of the input
   byte trigger_state = (PIND & B00000100) >> 2;
-  
+
+  // state HIGH is when there is no strobe trigger from the camera
   if (trigger_state == HIGH) {
-    state = LOW;
-    motor = HIGH;
+    state = STATE_MOVE;
     return;
   } else {
-    state = HIGH;
-    motor = LOW;
+    state = STATE_ACQUIRE;
   }
 }
 
@@ -119,17 +120,19 @@ void loop() {
   // listen to the serial port
   // listen_serial_port();
 
-  digitalWrite(BF_CHANNEL_PIN, state);
-  digitalWrite(MOTOR_LEFT_PIN, motor);
+  // get the current trigger
+  //Trigger current_trigger = sequencer.get_current_trigger();
+  sequencer.set_state(&state);
 
   // get the state of the input
   byte input_states = (PIND & B00000100) >> 2;
 
-  Serial.print("state: ");
-  Serial.println(input_states, BIN);
-//  Serial.print(" motor: ");
-//  Serial.println(motor, DEC);
+  Serial.print(-input_states, DEC);
+  Serial.print("\t");
+  Serial.print(state, DEC);
+  Serial.print("\t");
+  Serial.println(sequencer.m_counter, DEC);
 
-  delay(10);
+  delay(20);
 
 }

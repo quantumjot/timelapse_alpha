@@ -23,6 +23,10 @@
 #define IRFP_CHANNEL_PIN 10
 #define MAX_TRIGGERS 4
 
+#define STATE_WAIT 0
+#define STATE_ACQUIRE 1 
+#define STATE_MOVE 2
+
 #include "ledengine.h"
 #include "bsc201.h"
 
@@ -37,8 +41,8 @@ typedef struct {
 
 class TriggerSequencer {
   public:
-    TriggerSequencer() {};
-    ~TriggerSequencer() {};
+    TriggerSequencer() {}
+    ~TriggerSequencer() {}
 
     // add a trigger
     void add_trigger(byte a_channel_pin, byte a_motor_position, bool a_active) {
@@ -60,20 +64,56 @@ class TriggerSequencer {
 
       // increment the number of triggers
       m_num_triggers++;
-    };
+    }
 
     // clear the triggers
     void clear_triggers() {
       m_num_triggers = 0;
     }
 
-    void increment() {
-      counter++;
-      counter = counter % m_num_triggers;
+
+    void set_state(volatile byte* a_state) {
+
+      Trigger* this_trigger = get_trigger(m_counter);
+      Trigger* next_trigger = get_trigger(m_counter+1);
+      
+      switch (*a_state) {
+        case STATE_WAIT:
+          this_trigger->LED.off();
+          break;
+        case STATE_ACQUIRE:
+          this_trigger->LED.on();
+          break;
+        case STATE_MOVE:
+          // turn off the LED and move to the next position
+          this_trigger->LED.off();
+
+          // move the motor
+          m_stepper.goto_position(next_trigger->motor_position);
+
+          // return the volatile state to wait, once the move is completed
+          *a_state = STATE_WAIT;
+
+          // increment the trigger counter
+          increment();
+          break;
+      }
+       
     }
 
+    void increment() {
+      m_counter++;
+      m_counter = m_counter % m_num_triggers;
+    }
+
+    inline Trigger* get_trigger(byte a_trigger_idx) {
+      return &m_triggers[a_trigger_idx % m_num_triggers];
+    }
+
+    byte m_counter = 0;
+
   private:
-    byte counter;
+    
     byte m_num_triggers = 0;
 
     // make some space for the triggers

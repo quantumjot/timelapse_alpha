@@ -66,6 +66,9 @@ class StepperMotorBSC201
       unsigned int moves_left;
       unsigned int moves_right;
 
+      // test function
+      jog_left();
+
       if(moves_left > moves_right) {
         // move the motor right
       } else {
@@ -95,9 +98,9 @@ class StepperMotorBSC201
     void jog(uint8_t a_pin) {
       // TODO(arl): error check for the correct pins
       digitalWrite(a_pin, HIGH);
-      delay(10);
+      delay(100);
       digitalWrite(a_pin, LOW);
-      delay(50);
+      delay(10);
     }
     
 };
