@@ -99,14 +99,13 @@ class ArduinoAcquisitionManager(object):
         if duration_ms < 0 or duration_ms>9999:
             raise ValueError("Duration of trigger is not in accepted range")
 
-        trig = {'name':name,
-                'duration_ms':duration_ms,
-                'motor_pos':motor_pos,
-                'ID': AVAILABLE_TRIGGERS.index(name)}
+        trig = {'name': name,
+                'duration_ms': duration_ms,
+                'motor_pos': motor_pos,
+                'ID': AVAILABLE_TRIGGERS.index(name),
+                'active': 1}
         self.triggers.append(trig)
         logger.info("Appended new trigger: {0:s}".format(name))
-
-        # TODO(arl): write the trigger settings to the arduino
 
 
     def setup(self):
@@ -119,8 +118,8 @@ class ArduinoAcquisitionManager(object):
         for trigger in self.triggers:
             logger.info("Sending trigger {0:s} to Arduino...".format(trigger['name']))
             trig = "SET,{0:d},{1:d},{2:d}".format(trigger['ID'],
-                                                  trigger['duration_ms'],
-                                                  trigger['motor_pos'])
+                                                  trigger['motor_pos'],
+                                                  trigger['active'])
             self.arduino.write(trig)
             time.sleep(0.1)
 
@@ -150,9 +149,11 @@ class ArduinoAcquisitionManager(object):
 
 if __name__ == "__main__":
     aqm = ArduinoAcquisitionManager()
-    aqm.add_trigger("BF", duration_ms=50, motor_pos=0)
+    aqm.add_trigger("BF", motor_pos=0)
+    aqm.add_trigger("GFP", motor_pos=0)
+    aqm.add_trigger("RFP", motor_pos=0)
+    aqm.add_trigger("IRFP", motor_pos=1)
     aqm.setup()
-    while True:
-        aqm.acquire()
-        time.sleep(1)
-        aqm.info()
+
+    # trigger the acquire mode
+    aqm.acquire()
