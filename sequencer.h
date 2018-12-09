@@ -79,6 +79,9 @@ class TriggerSequencer {
       // if the stepper motor has not been initialized, set it up
       if (!m_stepper.is_initialized()) {
         initialize();
+
+        // go to the first motor position so that we're already there 
+        m_stepper.goto_position(a_motor_position);
       }
 
       // store the trigger in the list
