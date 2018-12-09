@@ -38,6 +38,27 @@ typedef struct {
 } Trigger;
 
 
+/*
+ * TriggerSequencer
+ * 
+ * A class to coordinate the motors and LEDs such that the correct pulse sequence
+ * is provided. In general, a TTL pulse from the camera provides a HIGH signal
+ * during the exposure, dropping to LOW during the readout/time between 
+ * successive exposures.
+ * 
+ * New triggers can be added using the following syntax
+ *   TriggerSequencer.add_trigger(pin, motor_position, active)
+ *   
+ * These are followed in sequence, and triggered following a pulse from the 
+ * camera. This pulse causes the following to happen:
+ * 
+ * + On the rising edge, the correct LED is turned on
+ * + On the falling edge, the same LED is turned off, and the motor moves to the 
+ *   next position for the next image in the sequence.
+ *   
+ * The sequencer moves through each trigger in turn, returning to the first one
+ * once the final trigger/move combination has been executed.
+ */
 
 class TriggerSequencer {
   public:
@@ -89,6 +110,7 @@ class TriggerSequencer {
           break;
         case STATE_ACQUIRE:
           this_trigger->LED.on();
+          m_num_images++;
           break;
         case STATE_MOVE:
           // turn off the LED and move to the next position
@@ -96,6 +118,7 @@ class TriggerSequencer {
 
           // move the motor
           m_stepper.goto_position(next_trigger->motor_position);
+          m_num_moves++;
 
           // return the volatile state to wait, once the move is completed
           *a_state = STATE_WAIT;
@@ -107,28 +130,35 @@ class TriggerSequencer {
        
     }
 
-    void increment() {
-      m_counter++;
-      m_counter = m_counter % m_num_triggers;
-    }
-
-    inline Trigger* get_trigger(byte a_trigger_idx) {
-      return &m_triggers[a_trigger_idx % m_num_triggers];
-    }
-
     byte m_counter = 0;
 
   private:
     
     byte m_num_triggers = 0;
 
+    unsigned int m_num_images = 0;
+    unsigned int m_num_moves = 0;
+
     // make some space for the triggers
     Trigger m_triggers[MAX_TRIGGERS];
 
     StepperMotorBSC201 m_stepper;
 
+    // initialize the stepper motor driver
     void initialize() {
        // set up the stepper motor driver 
        m_stepper = StepperMotorBSC201(MOTOR_LEFT_PIN, MOTOR_RIGHT_PIN);
     }
+
+    // increment the trigger counter
+    void increment() {
+      m_counter++;
+      m_counter = m_counter % m_num_triggers;
+    }
+
+    // get a pointer to a particular trigger (modulo number of triggers)
+    inline Trigger* get_trigger(byte a_trigger_idx) {
+      return &m_triggers[a_trigger_idx % m_num_triggers];
+    }
+
 };

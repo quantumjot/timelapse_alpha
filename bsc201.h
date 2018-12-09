@@ -60,7 +60,7 @@ class StepperMotorBSC201
       uint8_t current_position = m_motor_position % FILTER_WHEEL_POSITIONS;
 
       // do we actually need to move the motor?
-      if(a_position == curr_position) return;
+      if(a_position == current_position) return;
 
       // move difference
       int position_diff = a_position - current_position;
