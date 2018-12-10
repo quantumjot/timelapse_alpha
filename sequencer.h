@@ -14,13 +14,9 @@
  * 
  */
 
-#define CAMERA_CHANNEL_PIN 2
+
 #define MOTOR_LEFT_PIN 4
 #define MOTOR_RIGHT_PIN 5
-#define BF_CHANNEL_PIN 7
-#define GFP_CHANNEL_PIN 8
-#define RFP_CHANNEL_PIN 9
-#define IRFP_CHANNEL_PIN 10
 #define MAX_TRIGGERS 4
 
 #define STATE_WAIT 0
@@ -68,7 +64,7 @@ class TriggerSequencer {
     ~TriggerSequencer() {}
 
     // add a trigger
-    void add_trigger(byte a_channel_pin, byte a_motor_position, bool a_active) {
+    void add_trigger(uint8_t a_channel_pin, uint8_t a_motor_position, bool a_active) {
 
       // check that we haven't exceed the number of triggers 
       if (m_num_triggers >= MAX_TRIGGERS) return;
@@ -92,7 +88,8 @@ class TriggerSequencer {
       m_num_triggers++;
     }
 
-    // clear the triggers
+    // clear the triggers, NOTE that this does not reset the contents 
+    // of the triggers, only the counter
     void clear_triggers() {
       m_num_triggers = 0;
     }
@@ -118,33 +115,31 @@ class TriggerSequencer {
         case STATE_MOVE:
           // turn off the LED and move to the next position
           this_trigger->LED.off();
-
-          // move the motor
           m_stepper.goto_position(next_trigger->motor_position);
           m_num_moves++;
 
           // return the volatile state to wait, once the move is completed
+          // and increment the trigger counter
           *a_state = STATE_WAIT;
-
-          // increment the trigger counter
           increment();
           break;
       }
        
     }
 
-    byte m_counter = 0;
+    // master trigger counter
+    uint8_t m_counter = 0;
 
   private:
     
-    byte m_num_triggers = 0;
-
-    unsigned int m_num_images = 0;
-    unsigned int m_num_moves = 0;
+    uint8_t m_num_triggers = 0;
+    uint32_t m_num_images = 0;
+    uint32_t m_num_moves = 0;
 
     // make some space for the triggers
     Trigger m_triggers[MAX_TRIGGERS];
 
+    // stepper motor controller
     StepperMotorBSC201 m_stepper;
 
     // initialize the stepper motor driver

@@ -17,16 +17,19 @@
 
 // this is the pin from the camera strobe trigger
 #define CAMERA_CHANNEL_PIN 2
+
+// digital outs to trigger LEDs
 #define BF_CHANNEL_PIN 7
 #define GFP_CHANNEL_PIN 8
 #define RFP_CHANNEL_PIN 9
 #define IRFP_CHANNEL_PIN 10
 
 // states for trigger interrupts (0 - WAIT, 1-ACQUIRE, 2-MOVE)
+// these are defined in sequencer.h
 volatile byte state = STATE_WAIT;
 
 // timelapse mode
-bool timelapse_mode = false;
+bool timelapse_mode = true;
 
 // trigger sequencer
 TriggerSequencer sequencer;
@@ -40,7 +43,14 @@ void setup() {
   sequencer.add_trigger(BF_CHANNEL_PIN, 0, true);
   sequencer.add_trigger(GFP_CHANNEL_PIN, 1, true);
   sequencer.add_trigger(RFP_CHANNEL_PIN, 2, true);
-  //sequencer.add_trigger(BF_CHANNEL_PIN, 3, true);
+
+  /*
+  // DEFAULT SETUP FOR SCOPE
+  sequencer.add_trigger(BF_CHANNEL_PIN, 0, true);
+  sequencer.add_trigger(GFP_CHANNEL_PIN, 0, true);
+  sequencer.add_trigger(RFP_CHANNEL_PIN, 0, true);
+  sequencer.add_trigger(IRFP_CHANNEL_PIN, 1, true);
+  */
   
   // set up the input/strobe triggers
   // use the internal 20kOhm pull-up resistor NOTE: the logic is inverted due to the pullup
@@ -122,9 +132,12 @@ void loop() {
   // listen to the serial port
   // listen_serial_port();
 
-  // get the current trigger
-  sequencer.set_state(&state);
+  if (timelapse_mode) {
+    // get the current trigger
+    sequencer.set_state(&state);
+  }
 
+  /*
   // get the state of the input
   byte input_states = (PIND & B00000100) >> 2;
 
@@ -133,6 +146,7 @@ void loop() {
   Serial.print(state, DEC);
   Serial.print("\t");
   Serial.println(sequencer.m_counter, DEC);
+  */
 
   delay(20);
 

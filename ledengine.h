@@ -30,7 +30,7 @@ class LEDEngine
 
 
   // trigger the LEDs and camera
-  void trigger(unsigned int a_duration_ms) {
+  void trigger(uint16_t a_duration_ms) {
     on();
     delay(a_duration_ms);
     off();  

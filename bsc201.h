@@ -63,19 +63,19 @@ class StepperMotorBSC201
       if(a_position == current_position) return;
 
       // move difference
-      int position_diff = a_position - current_position;
+      int8_t position_diff = a_position - current_position;
 
       // SANITY check, make sure we don't move too many positions
       if(abs(position_diff) >= FILTER_WHEEL_POSITIONS) return;
 
       if(position_diff > 0) {
         // move the motor right
-        for(unsigned int mv=0; mv<abs(position_diff); mv++) {
+        for(uint8_t mv=0; mv<abs(position_diff); mv++) {
           jog_right();
         }
       } else {
         // move the motor left
-        for(unsigned int mv=0; mv<abs(position_diff); mv++) {
+        for(uint8_t mv=0; mv<abs(position_diff); mv++) {
           jog_left();
         }
       }
