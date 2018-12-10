@@ -106,7 +106,9 @@ class TriggerSequencer {
 
       switch (*a_state) {
         case STATE_WAIT:
-          this_trigger->LED.off();
+          
+          // NOTE(arl): is this really necessary, just a fail safe?
+          //this_trigger->LED.off();
           break;
         case STATE_ACQUIRE:
           this_trigger->LED.on();
@@ -126,8 +128,8 @@ class TriggerSequencer {
       }
     }
 
-    int6_t get_motor_position(void){
-      return m_stepper.motor_position;
+    int16_t get_motor_position(void){
+      return m_stepper.motor_position();
     }
 
     // master trigger counter

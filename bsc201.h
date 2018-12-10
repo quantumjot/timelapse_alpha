@@ -14,7 +14,10 @@
  *
  */
 
+//#include "TimerOne.h"
+
 #define FILTER_WHEEL_POSITIONS 6
+#define JOG_PULSE_LENGTH_MS 160
 
 class StepperMotorBSC201
 {
@@ -101,12 +104,30 @@ class StepperMotorBSC201
     int16_t m_motor_position;
 
     // send a TTL pulse to the motor jog pins, note that this takes approx 55ms
+    /*
     void jog(uint8_t a_pin) {
       // TODO(arl): error check for the correct pins
       digitalWrite(a_pin, HIGH);
       delay(150);
       digitalWrite(a_pin, LOW);
       delay(10);
+    }
+    */
+
+    void jog(uint8_t a_pin) {
+      // NOTE(arl): we need to be prepared for interrupts to occur during this 
+      // motor move, in which case it's possible that we inadvertently send more 
+      // than one jog pulse to the motor controller --> this would be bad since
+      // we wouldn't necessarily know!
+      //
+      // This could be useful:
+      // Timer1.attachInterrupt(f, duration_ms)
+      unsigned long start_jog = millis();
+      digitalWrite(a_pin, HIGH);
+      while (millis()-start_jog <= JOG_PULSE_LENGTH_MS) {
+        // do nothing!
+      }
+      digitalWrite(a_pin, LOW);
     }
 
 };

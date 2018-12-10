@@ -150,6 +150,6 @@ void loop() {
   Serial.println(sequencer.get_motor_position(), DEC);
   */
 
-  delay(20);
+  // delay(20);
 
 }
