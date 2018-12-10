@@ -1,16 +1,16 @@
 /*
  * timelapse_alpha
- * 
+ *
  * Arduino code to talk to a python interface. Takes care of scheduling the camera
- * acquisitions, light source triggering and stepper motor based filter wheels using 
+ * acquisitions, light source triggering and stepper motor based filter wheels using
  * TTL pulses to synchronize.
- * 
+ *
  * Talks to the host via a virtual COM port
- * 
+ *
  * Alan R. Lowe (a.lowe@ucl.ac.uk)
  * December 2018
  * lowe.cs.ucl.ac.uk
- * 
+ *
  */
 
 #include "sequencer.h"
@@ -51,7 +51,7 @@ void setup() {
   sequencer.add_trigger(RFP_CHANNEL_PIN, 0, true);
   sequencer.add_trigger(IRFP_CHANNEL_PIN, 1, true);
   */
-  
+
   // set up the input/strobe triggers
   // use the internal 20kOhm pull-up resistor NOTE: the logic is inverted due to the pullup
   pinMode(CAMERA_CHANNEL_PIN, INPUT_PULLUP);
@@ -107,7 +107,7 @@ uint8_t listen_serial_port(void) {
         // TODO(arl): This is just a test trigger
         // trigger_BF.LED.trigger(200);
         break;
-        
+
       case 'S':
         // SETUP
         break;
@@ -119,10 +119,10 @@ uint8_t listen_serial_port(void) {
         break;
     }
 
-  
+
 
   }
-  
+
   return 0;
 }
 
@@ -145,7 +145,9 @@ void loop() {
   Serial.print("\t");
   Serial.print(state, DEC);
   Serial.print("\t");
-  Serial.println(sequencer.m_counter, DEC);
+  Serial.print(sequencer.m_counter, DEC);
+  Serial.print("\t");
+  Serial.println(sequencer.get_motor_position(), DEC);
   */
 
   delay(20);

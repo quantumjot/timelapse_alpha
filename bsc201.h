@@ -1,17 +1,17 @@
 
 /*
  * timelapse_alpha
- * 
+ *
  * Arduino code to talk to a python interface. Takes care of scheduling the camera
- * acquisitions, light source triggering and stepper motor based filter wheels using 
+ * acquisitions, light source triggering and stepper motor based filter wheels using
  * TTL pulses to synchronize.
- * 
+ *
  * Talks to the host via a virtual COM port
- * 
+ *
  * Alan R. Lowe (a.lowe@ucl.ac.uk)
  * December 2018
  * lowe.cs.ucl.ac.uk
- * 
+ *
  */
 
 #define FILTER_WHEEL_POSITIONS 6
@@ -30,13 +30,13 @@ class StepperMotorBSC201
       m_motor_right_pin = a_motor_right_pin;
       m_motor_position = 0;
 
-      // set these pins to outputs 
+      // set these pins to outputs
       pinMode(m_motor_left_pin, OUTPUT);
       pinMode(m_motor_right_pin, OUTPUT);
 
       m_initialized = true;
     }
-    
+
 
     // jog the motor left
     void jog_left() {
@@ -80,7 +80,7 @@ class StepperMotorBSC201
           jog_left();
         }
       }
-      
+
     }
 
     // is the motor initialized
@@ -90,23 +90,23 @@ class StepperMotorBSC201
 
 
   private:
-    // flag for initialized 
+    // flag for initialized
     bool m_initialized = false;
-  
+
     // store the pins to jog the motor
     uint8_t m_motor_left_pin;
     uint8_t m_motor_right_pin;
 
     // internal motor position
     int16_t m_motor_position;
-  
+
     // send a TTL pulse to the motor jog pins, note that this takes approx 55ms
     void jog(uint8_t a_pin) {
       // TODO(arl): error check for the correct pins
       digitalWrite(a_pin, HIGH);
-      delay(100);
+      delay(150);
       digitalWrite(a_pin, LOW);
       delay(10);
     }
-    
+
 };

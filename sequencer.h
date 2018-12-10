@@ -1,17 +1,17 @@
 
 /*
  * timelapse_alpha
- * 
+ *
  * Arduino code to talk to a python interface. Takes care of scheduling the camera
- * acquisitions, light source triggering and stepper motor based filter wheels using 
+ * acquisitions, light source triggering and stepper motor based filter wheels using
  * TTL pulses to synchronize.
- * 
+ *
  * Talks to the host via a virtual COM port
- * 
+ *
  * Alan R. Lowe (a.lowe@ucl.ac.uk)
  * December 2018
  * lowe.cs.ucl.ac.uk
- * 
+ *
  */
 
 
@@ -20,7 +20,7 @@
 #define MAX_TRIGGERS 4
 
 #define STATE_WAIT 0
-#define STATE_ACQUIRE 1 
+#define STATE_ACQUIRE 1
 #define STATE_MOVE 2
 
 #include "ledengine.h"
@@ -36,22 +36,22 @@ typedef struct {
 
 /*
  * TriggerSequencer
- * 
+ *
  * A class to coordinate the motors and LEDs such that the correct pulse sequence
  * is provided. In general, a TTL pulse from the camera provides a HIGH signal
- * during the exposure, dropping to LOW during the readout/time between 
+ * during the exposure, dropping to LOW during the readout/time between
  * successive exposures.
- * 
+ *
  * New triggers can be added using the following syntax
  *   TriggerSequencer.add_trigger(pin, motor_position, active)
- *   
- * These are followed in sequence, and triggered following a pulse from the 
+ *
+ * These are followed in sequence, and triggered following a pulse from the
  * camera. This pulse causes the following to happen:
- * 
+ *
  * + On the rising edge, the correct LED is turned on
- * + On the falling edge, the same LED is turned off, and the motor moves to the 
+ * + On the falling edge, the same LED is turned off, and the motor moves to the
  *   next position for the next image in the sequence.
- *   
+ *
  * The sequencer moves through each trigger in turn, returning to the first one
  * once the final trigger/move combination has been executed.
  */
@@ -66,9 +66,9 @@ class TriggerSequencer {
     // add a trigger
     void add_trigger(uint8_t a_channel_pin, uint8_t a_motor_position, bool a_active) {
 
-      // check that we haven't exceed the number of triggers 
+      // check that we haven't exceed the number of triggers
       if (m_num_triggers >= MAX_TRIGGERS) return;
-      
+
       // set up the LED pin
       LEDEngine led = LEDEngine(a_channel_pin);
 
@@ -76,7 +76,7 @@ class TriggerSequencer {
       if (!m_stepper.is_initialized()) {
         initialize();
 
-        // go to the first motor position so that we're already there 
+        // go to the first motor position so that we're already there
         m_stepper.goto_position(a_motor_position);
       }
 
@@ -88,7 +88,7 @@ class TriggerSequencer {
       m_num_triggers++;
     }
 
-    // clear the triggers, NOTE that this does not reset the contents 
+    // clear the triggers, NOTE that this does not reset the contents
     // of the triggers, only the counter
     void clear_triggers() {
       m_num_triggers = 0;
@@ -103,7 +103,7 @@ class TriggerSequencer {
       // get the current and subsequent trigger.
       Trigger* this_trigger = get_trigger(m_counter);
       Trigger* next_trigger = get_trigger(m_counter+1);
-      
+
       switch (*a_state) {
         case STATE_WAIT:
           this_trigger->LED.off();
@@ -113,25 +113,28 @@ class TriggerSequencer {
           m_num_images++;
           break;
         case STATE_MOVE:
-          // turn off the LED and move to the next position
-          this_trigger->LED.off();
-          m_stepper.goto_position(next_trigger->motor_position);
-          m_num_moves++;
-
           // return the volatile state to wait, once the move is completed
           // and increment the trigger counter
           *a_state = STATE_WAIT;
           increment();
+
+          // turn off the LED and move to the next position
+          this_trigger->LED.off();
+          m_stepper.goto_position(next_trigger->motor_position);
+          m_num_moves++;
           break;
       }
-       
+    }
+
+    int6_t get_motor_position(void){
+      return m_stepper.motor_position;
     }
 
     // master trigger counter
     uint8_t m_counter = 0;
 
   private:
-    
+
     uint8_t m_num_triggers = 0;
     uint32_t m_num_images = 0;
     uint32_t m_num_moves = 0;
@@ -144,7 +147,7 @@ class TriggerSequencer {
 
     // initialize the stepper motor driver
     void initialize() {
-       // set up the stepper motor driver 
+       // set up the stepper motor driver
        m_stepper = StepperMotorBSC201(MOTOR_LEFT_PIN, MOTOR_RIGHT_PIN);
     }
 
