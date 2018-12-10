@@ -50,8 +50,9 @@ class StepperMotorBSC201
       m_motor_position++;
     }
 
-    // get the motor position
-    int motor_position() {
+    // get the motor position, this can be negative
+    // can be used as an indicator in case we've missed a jog
+    int16_t motor_position() {
       return m_motor_position;
     }
 
@@ -97,7 +98,7 @@ class StepperMotorBSC201
     uint8_t m_motor_right_pin;
 
     // internal motor position
-    int m_motor_position;
+    int16_t m_motor_position;
   
     // send a TTL pulse to the motor jog pins, note that this takes approx 55ms
     void jog(uint8_t a_pin) {

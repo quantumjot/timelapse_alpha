@@ -38,12 +38,12 @@ class LEDEngine
 
   // turn the LED ON
   // NOTE(arl): temporary for common cathode LEDs
-  void on() {
+  inline void on() {
     digitalWrite(m_LED_pin, LOW);
   }
 
   // turn the LED and camera trigger OFF
-  void off() {
+  inline void off() {
     digitalWrite(m_LED_pin, HIGH);
   }
 
