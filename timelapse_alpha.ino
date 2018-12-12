@@ -24,6 +24,9 @@
 #define RFP_CHANNEL_PIN 9
 #define IRFP_CHANNEL_PIN 10
 
+// digital in pin for timelapse mode switch
+#define TIMELAPSE_MODE_PIN 3
+
 // states for trigger interrupts (0 - WAIT, 1-ACQUIRE, 2-MOVE)
 // these are defined in sequencer.h
 volatile byte state = STATE_WAIT;

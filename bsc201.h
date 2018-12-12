@@ -122,6 +122,11 @@ class StepperMotorBSC201
       //
       // This could be useful:
       // Timer1.attachInterrupt(f, duration_ms)
+      //
+      // Can also use some port manipulation here
+      // #define dwon(port, pin) (port |= _BV(pin))
+      // #define dwoff(port, pin) (port &= ~(_BV(pin)))
+
       unsigned long start_jog = millis();
       digitalWrite(a_pin, HIGH);
       while (millis()-start_jog <= JOG_PULSE_LENGTH_MS) {
