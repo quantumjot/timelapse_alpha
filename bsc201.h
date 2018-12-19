@@ -40,19 +40,6 @@ class StepperMotorBSC201
       m_initialized = true;
     }
 
-
-    // jog the motor left
-    void jog_left() {
-      jog(m_motor_left_pin);
-      m_motor_position--;
-    }
-
-    // jog the motor left
-    void jog_right() {
-      jog(m_motor_right_pin);
-      m_motor_position++;
-    }
-
     // get the motor position, this can be negative
     // can be used as an indicator in case we've missed a jog
     int16_t motor_position() {
@@ -74,14 +61,14 @@ class StepperMotorBSC201
 
       if(position_diff > 0) {
         // move the motor right
-        for(uint8_t mv=0; mv<abs(position_diff); mv++) {
-          jog_right();
-        }
+        // for(uint8_t mv=0; mv<abs(position_diff); mv++) {
+          jog_right(abs(position_diff));
+        // }
       } else {
         // move the motor left
-        for(uint8_t mv=0; mv<abs(position_diff); mv++) {
-          jog_left();
-        }
+        // for(uint8_t mv=0; mv<abs(position_diff); mv++) {
+          jog_left(abs(position_diff));
+        // }
       }
 
     }
@@ -114,9 +101,21 @@ class StepperMotorBSC201
     }
     */
 
-    void jog(uint8_t a_pin) {
-      // NOTE(arl): we need to be prepared for interrupts to occur during this 
-      // motor move, in which case it's possible that we inadvertently send more 
+    // jog the motor left
+    inline void jog_left(uint8_t a_num_jogs) {
+      jog(m_motor_left_pin, a_num_jogs);
+      m_motor_position-a_num_jogs;
+    }
+
+    // jog the motor left
+    inline void jog_right(uint8_t a_num_jogs) {
+      jog(m_motor_right_pin, a_num_jogs);
+      m_motor_position+a_num_jogs;
+    }
+
+    void jog(uint8_t a_pin, uint8_t a_num_jogs) {
+      // NOTE(arl): we need to be prepared for interrupts to occur during this
+      // motor move, in which case it's possible that we inadvertently send more
       // than one jog pulse to the motor controller --> this would be bad since
       // we wouldn't necessarily know!
       //
@@ -129,7 +128,7 @@ class StepperMotorBSC201
 
       unsigned long start_jog = millis();
       digitalWrite(a_pin, HIGH);
-      while (millis()-start_jog <= JOG_PULSE_LENGTH_MS) {
+      while (millis()-start_jog <= a_num_jogs*JOG_PULSE_LENGTH_MS) {
         // do nothing!
       }
       digitalWrite(a_pin, LOW);
