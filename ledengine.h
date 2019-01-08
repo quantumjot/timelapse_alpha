@@ -49,4 +49,5 @@ class LEDEngine
 
   private:
     uint8_t m_LED_pin;
+    String m_name = "GFP";
 };

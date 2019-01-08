@@ -25,6 +25,7 @@
 
 #include "ledengine.h"
 #include "bsc201.h"
+#include "lcddisplay.h"
 
 // structure to store the details of an LED channel trigger
 typedef struct {
@@ -132,6 +133,20 @@ class TriggerSequencer {
       return m_stepper.motor_position();
     }
 
+    // get a pointer to the status
+    StatusInfo* get_status(void) {
+
+      // get the current trigger
+      Trigger* this_trigger = get_trigger(m_counter);
+
+      m_status.motor_position = get_motor_position;
+      m_status.led_position = 0; //this_trigger->
+      m_status.counter = m_num_images;
+      m_status.active = true;
+
+      return &m_status;
+    }
+
     // master trigger counter
     uint8_t m_counter = 0;
 
@@ -140,6 +155,9 @@ class TriggerSequencer {
     uint8_t m_num_triggers = 0;
     uint32_t m_num_images = 0;
     uint32_t m_num_moves = 0;
+
+    // store the status info 
+    StatusInfo m_status;
 
     // make some space for the triggers
     Trigger m_triggers[MAX_TRIGGERS];
