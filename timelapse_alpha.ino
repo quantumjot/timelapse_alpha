@@ -43,17 +43,10 @@ void setup() {
 
   // set up the trigger sequencer
   sequencer.clear_triggers();
-  sequencer.add_trigger(BF_CHANNEL_PIN, 0, true);
-  sequencer.add_trigger(GFP_CHANNEL_PIN, 1, true);
-  sequencer.add_trigger(RFP_CHANNEL_PIN, 2, true);
-
-  /*
-  // DEFAULT SETUP FOR SCOPE
-  sequencer.add_trigger(BF_CHANNEL_PIN, 0, true);
-  sequencer.add_trigger(GFP_CHANNEL_PIN, 0, true);
-  sequencer.add_trigger(RFP_CHANNEL_PIN, 0, true);
-  sequencer.add_trigger(IRFP_CHANNEL_PIN, 1, true);
-  */
+  sequencer.add_trigger("BF", BF_CHANNEL_PIN, 0, true);
+  sequencer.add_trigger("GFP", GFP_CHANNEL_PIN, 0, true);
+  sequencer.add_trigger("RFP", RFP_CHANNEL_PIN, 0, true);
+  sequencer.add_trigger("iRFP", IRFP_CHANNEL_PIN, 1, true);
 
   // set up the input/strobe triggers
   // use the internal 20kOhm pull-up resistor NOTE: the logic is inverted due to the pullup

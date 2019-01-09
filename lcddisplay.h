@@ -13,7 +13,7 @@
  * lowe.cs.ucl.ac.uk
  *
  */
- 
+
 #include <SoftwareSerial.h>
 
 #define LCD_TX_PIN 10
@@ -21,9 +21,9 @@
 
 // structure to store the status information
 typedef struct {
-  uint8_t motor_position;
-  uint8_t led_position;
-  uint16_t counter;
+  int16_t motor_position;
+  String led_position;
+  uint32_t counter;
   bool active;
 } StatusInfo;
 
@@ -35,7 +35,7 @@ SoftwareSerial LCD(LCD_RX_PIN, LCD_TX_PIN);
  * LCDDisplay
  *
  * A class to display the status of the system on a 16x2 LCD display
- * 
+ *
  */
 
 class LCDDisplay {
@@ -46,22 +46,46 @@ class LCDDisplay {
       // set up the serial connection to the LCD display
       LCD.begin(9600);
       delay(500);
+
+      // clear the display and then write the static information
+      clear();
+      write_static_info();
     }
     ~LCDDisplay() {}
 
     void update(const StatusInfo* a_status) {
 
-      // clear the display 
-      clear();
+      // write the current LED name
+      LCD.write(254);
+      LCD.write(128+5);
+      LCD.write(a_LED);
+
+      // write the current status (i.e. active boolean)
+
+      // write the current image counter
+
+      // write the current filter position
+
     }
 
   private:
 
     // clear the display
     void clear() {
-      LCD.write(254); 
+      LCD.write(254);
       LCD.write(128);
-      LCD.write("                "); 
       LCD.write("                ");
+      LCD.write("                ");
+    }
+
+    void write_static_info() {
+      LCD.write(254);
+      LCD.write(128);
+      LCD.write("LED:      A:    ");
+      LCD.write("Imag: 00000 F: 0");
+    }
+
+    void write_LED_info(const char* a_LED) {
+
     }
 };

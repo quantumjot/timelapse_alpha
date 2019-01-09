@@ -19,9 +19,12 @@ class LEDEngine
   public:
 
     LEDEngine() {};
-    LEDEngine(uint8_t a_LED_pin) {
+    LEDEngine(const uint8_t a_LED_pin,
+              const String a_name) {
+                
       // set the member variables
       m_LED_pin = a_LED_pin;
+      m_name = a_name;
 
       // set these pins to outputs 
       pinMode(m_LED_pin, OUTPUT);
@@ -47,7 +50,12 @@ class LEDEngine
     digitalWrite(m_LED_pin, HIGH);
   }
 
+  // get the name of the LED
+  String get_name(void) {
+    return m_name;
+  }
+
   private:
     uint8_t m_LED_pin;
-    String m_name = "GFP";
+    String m_name;
 };

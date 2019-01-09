@@ -65,13 +65,23 @@ class TriggerSequencer {
     ~TriggerSequencer() {}
 
     // add a trigger
-    void add_trigger(uint8_t a_channel_pin, uint8_t a_motor_position, bool a_active) {
+    void add_trigger(const uint8_t a_channel_pin, 
+                     const uint8_t a_motor_position, 
+                     const bool a_active) {
+
+      add_trigger("NULL", a_channel_pin, a_motor_position, a_active);
+    }
+
+    void add_trigger(const String a_name,
+                     const uint8_t a_channel_pin, 
+                     const uint8_t a_motor_position, 
+                     const bool a_active) {
 
       // check that we haven't exceed the number of triggers
       if (m_num_triggers >= MAX_TRIGGERS) return;
 
       // set up the LED pin
-      LEDEngine led = LEDEngine(a_channel_pin);
+      LEDEngine led = LEDEngine(a_channel_pin, a_name);
 
       // if the stepper motor has not been initialized, set it up
       if (!m_stepper.is_initialized()) {
@@ -139,8 +149,9 @@ class TriggerSequencer {
       // get the current trigger
       Trigger* this_trigger = get_trigger(m_counter);
 
-      m_status.motor_position = get_motor_position;
-      m_status.led_position = 0; //this_trigger->
+      // set the status info
+      m_status.motor_position = get_motor_position();
+      m_status.led_position = this_trigger->LED.get_name();
       m_status.counter = m_num_images;
       m_status.active = true;
 
